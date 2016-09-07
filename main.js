@@ -26,11 +26,6 @@ function getDeltaTime() {
 	return deltaTime;
 }
 
-// hi world
-
-//if (player.y >= canvas.height) lives--;  LOSE LIVES 
-
-//if (player.position.y - worldOffset.y <= canvas.height){var lives =-1;}
 
 
 //-------------------- Don't modify anything above here
