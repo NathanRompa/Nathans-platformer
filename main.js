@@ -51,23 +51,24 @@ var LAYER_LADDERS = 2;
 var LAYER_OBJECT_ENEMIES = 4;
 var LAYER_OBJECT_TRIGGERS = 3;
 
-var GameOverTimer = 3;
+var timer = 20;
+var deathGruntTimer = 4;
+var gameOverTimer = 7.3;
+var gameOverReload = 20;
 var splashTimer = 1;
 var STATE_SPLASH = 0;
 var STATE_GAME = 1;
 var STATE_GAMEOVER = 2;
 var STATE_WIN = 3;
 var gameState = STATE_SPLASH;
-var gameWon = {
-	hasWon: false,
-};
-
-var audioGameOver = new Audio("gameOver.mp3");
-
-var timer = 20;
+var gameWon = false;
+var gameOver = false;
 var score = 0;
 var lives = 3;
-var gameOver = false;
+
+var audioGameOver = new Audio("gameOver.mp3");
+var audioDeathGrunt = new Audio("deathGrunt.wav");
+var audioFallGrunt = new Audio("fallGrunt.wav");
 
 // abitrary choice for 1m
 var METER = TILE;
@@ -140,10 +141,6 @@ function bound(value, min, max) {
 	return value;
 }
 
-if (audioGameOver.end == true) {
-	audioGameOver.pause();
-}
-
 function drawMap() {
 	var maxTiles = Math.floor(SCREEN_WIDTH / TILE) + 2;
 	var tileX = pixelToTile(player.position.x);
@@ -183,6 +180,12 @@ function drawMap() {
 		}
 	}
 
+}
+
+function drawBackground () {
+	var gameBackground = document.createElement("img");
+    gameBackground.src = "jungleBackground.png";
+    context.drawImage(gameBackground, 0, 0)
 }
 
 var musicBackground;
@@ -293,8 +296,10 @@ function runSplash(deltaTime) {
 
 function runGame(deltaTime) {
 	player.update(deltaTime); // update the player before drawing the map
+		drawBackground();
 	drawMap();
 	player.draw();
+
 	// update the frame counter 
 	fpsTime += deltaTime;
 	fpsCount++;
@@ -317,7 +322,7 @@ function runGame(deltaTime) {
 	timer -= deltaTime;
 
 	if (timer <= 0) {
-		runGameOver();
+		gameState = STATE_GAMEOVER;
 	}
 
 	// life counter
@@ -327,28 +332,48 @@ function runGame(deltaTime) {
 
   			if (player.position.y > canvas.height + 80)
 	{ lives = lives - 1
+		audioFallGrunt.play();
 		player.position.set(9 * TILE, 7 * TILE); }
 
+		  	if (player.position.y > canvas.height)
+	{ 
+		audioFallGrunt.play();
+ }
+
 if (lives <= 0){
-runGameOver();
+gameState = STATE_GAMEOVER;
 }
-if (gameWon.hasWon == true) {
-	runGameWon();
+if (gameWon == true) {
+	gameState = STATE_WIN;
 }
 }
 
 function runGameOver(deltaTime) {
 
-    GameOverTimer -= deltaTime;
-    if (GameOverTimer <= 0) {
+    gameOverReload -= deltaTime;
+    if (gameOverReload <= 0) {
         document.location.reload();
     }
+
     var Game_over = document.createElement("img");
     Game_over.src = "SNAKE!.png";
     context.drawImage(Game_over, 0, 0)
 	lives = 0
+
 	musicBackground.pause();
 	audioGameOver.play();
+	audioDeathGrunt.play();
+
+	gameOverTimer -= deltaTime;
+	deathGruntTimer -= deltaTime;
+
+	if (gameOverTimer <= 0) {
+		audioGameOver.pause();
+	}
+
+	if (deathGruntTimer <= 0) {
+		audioDeathGrunt.pause();
+	}
 }
 
 function runGameWon(deltaTime) {
@@ -358,6 +383,7 @@ function runGameWon(deltaTime) {
 	context.font = "32px Arial";
 	context.fillStyle = "red"
 	context.fillText("WINNER!", SCREEN_WIDTH / 2 - 60, SCREEN_HEIGHT / 2 - 5);
+	musicBackground.pause();
 }
 
 initialize();

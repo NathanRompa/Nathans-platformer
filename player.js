@@ -36,8 +36,12 @@ var ANIM_IDLE_RIGHT = 3;
 var ANIM_JUMP_RIGHT = 4;
 var ANIM_WALK_RIGHT = 5;
 var ANIM_MAX = 6;
+var footTimer = 0.5
 
 var vector2 = new Vector2();
+
+var audioLeftFoot = new Audio("leftFoot.wav");
+var audioLeftFoot = new Audio("leftFoot.wav");
 
 Player.prototype.update = function (deltaTime) {
 
@@ -54,6 +58,7 @@ Player.prototype.update = function (deltaTime) {
       this.jumping == false)
 
       this.sprite.setAnimation(ANIM_WALK_LEFT);
+      audioLeftFoot.play();
   }
 
   else if (keyboard.isKeyDown(keyboard.KEY_RIGHT) == true) {
@@ -63,6 +68,7 @@ Player.prototype.update = function (deltaTime) {
       this.jumping == false)
 
       this.sprite.setAnimation(ANIM_WALK_RIGHT);
+      audioLeftFoot.play();
   }
   else {
     if (this.jumping == false && this.falling == false) {
@@ -84,6 +90,7 @@ Player.prototype.update = function (deltaTime) {
     if (right == true) {
       this.sprite.setAnimation(ANIM_JUMP_RIGHT);
     }
+    audioLeftFoot.pause();
   }
 
   if (this.cooldownTimer > 0) {
@@ -191,7 +198,7 @@ Player.prototype.update = function (deltaTime) {
     }
   }
     if (cellAtTileCoord(LAYER_OBJECT_TRIGGERS, tx, ty) == true) {
-    gameWon.hasWon = true;
+    gameWon = true;
   }
 }
 
